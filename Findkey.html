@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+<title>FindKey</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  background:#08080c;
+  color:#fff;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  overflow:hidden;
+}
+
+button,input{
+  font-family:inherit;
+}
+
+#intro{
+  position:fixed;
+  inset:0;
+  background:#08080c;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+  transition:.5s;
+}
+
+.logo{
+  font-size:46px;
+  font-weight:900;
+  color:#8065ff;
+  text-shadow:0 0 30px rgba(128,101,255,.6);
+}
+
+.introText{
+  margin-top:10px;
+  color:#888;
+  font-size:14px;
+}
+
+.install{
+  margin-top:40px;
+  width:210px;
+  height:55px;
+  border:0;
+  border-radius:16px;
+  background:#8065ff;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+}
+
+#app{
+  display:none;
+  height:100%;
+  overflow:auto;
+  padding:18px;
+}
+
+.header{
+  height:58px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.header button{
+  width:45px;
+  height:45px;
+  border:0;
+  border-radius:14px;
+  background:#15151d;
+  color:white;
+  font-size:21px;
+}
+
+.logoSmall{
+  font-size:21px;
+  font-weight:bold;
+}
+
+.logoSmall span{
+  color:#8065ff;
+}
+
+.search{
+  margin-top:25px;
+}
+
+.search input{
+  width:100%;
+  height:54px;
+  padding:0 16px;
+  border:1px solid #292936;
+  border-radius:16px;
+  background:#111118;
+  color:white;
+  outline:none;
+  font-size:14px;
+}
+
+.btn{
+  width:100%;
+  height:52px;
+  margin-top:11px;
+  border:0;
+  border-radius:15px;
+  background:#8065ff;
+  color:white;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.btn.secondary{
+  background:#171720;
+  border:1px solid #292936;
+}
+
+.location{
+  margin-top:20px;
+  padding:18px;
+  border-radius:18px;
+  background:#111118;
+  border:1px solid #252532;
+}
+
+.locationTitle{
+  font-weight:bold;
+}
+
+.status{
+  margin-top:8px;
+  color:#999;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.locationBtn{
+  margin-top:15px;
+  width:100%;
+  height:50px;
+  border:0;
+  border-radius:14px;
+  background:#25202f;
+  color:white;
+  font-weight:bold;
+}
+
+.locationBtn.active{
+  background:#245d43;
+}
+
+.debug{
+  margin-top:12px;
+  padding:12px;
+  border-radius:12px;
+  background:#0d0d13;
+  color:#777;
+  font-size:11px;
+  word-break:break-word;
+  display:none;
+}
+
+.result{
+  display:none;
+  margin-top:18px;
+  padding:18px;
+  border-radius:18px;
+  background:#111118;
+  border:1px solid #252532;
+}
+
+.map{
+  margin-top:14px;
+  height:150px;
+  border-radius:15px;
+  background:#1a1a22;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#aaa;
+  padding:15px;
+}
+
+.maps{
+  width:100%;
+  height:48px;
+  margin-top:12px;
+  border:0;
+  border-radius:14px;
+  background:#252532;
+  color:white;
+  font-weight:bold;
+}
+
+.overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  z-index:20;
+}
+
+.menu{
+  position:absolute;
+  left:12px;
+  top:75px;
+  width:250px;
+  padding:10px;
+  border-radius:20px;
+  background:#111118;
+  border:1px solid #292936;
+}
+
+.menu button{
+  width:100%;
+  padding:15px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  color:white;
+  text-align:left;
+}
+
+.panel{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#08080c;
+  z-index:30;
+  padding:20px;
+  overflow:auto;
+}
+
+.panelHeader{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.close{
+  width:42px;
+  height:42px;
+  border:0;
+  border-radius:13px;
+  background:#171720;
+  color:white;
+  font-size:20px;
+}
+
+.info{
+  padding:18px;
+  border-radius:18px;
+  background:#111118;
+  border:1px solid #252532;
+}
+
+.row{
+  padding:14px 0;
+  border-bottom:1px solid #22222b;
+}
+
+.row:last-child{
+  border-bottom:0;
+}
+
+.label{
+  color:#777;
+  font-size:12px;
+}
+
+.value{
+  margin-top:5px;
+  font-size:14px;
+  font-weight:bold;
+  word-break:break-word;
+}
+
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translate(-50%,20px);
+  background:#1b1b25;
+  border:1px solid #30303d;
+  border-radius:14px;
+  padding:13px 18px;
+  max-width:90%;
+  text-align:center;
+  font-size:13px;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+  z-index:1000;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= INTRO ================= -->
+
+<div id="intro">
+
+  <div class="logo">
+    FindKey
+  </div>
+
+  <div class="introText">
+    Protección y recuperación
+  </div>
+
+  <button
+    class="install"
+    onclick="startFindKey()">
+    📲 INSTALAR
+  </button>
+
+</div>
+
+<!-- ================= APP ================= -->
+
+<div id="app">
+
+  <div class="header">
+
+    <button onclick="openMenu()">☰</button>
+
+    <div class="logoSmall">
+      Find<span>Key</span>
+    </div>
+
+    <button onclick="openProfile()">👤</button>
+
+  </div>
+
+  <div class="search">
+
+    <input
+      id="searchInput"
+      placeholder="Ingresa el ID de la persona que quieras rastrear"
+      autocomplete="off"
+      autocapitalize="characters">
+
+    <button
+      class="btn"
+      onclick="searchDevice()">
+      🌐 Buscar con Internet
+    </button>
+
+    <button
+      class="btn secondary"
+      onclick="offlineSearch()">
+      📵 Buscar sin Internet
+    </button>
+
+  </div>
+
+  <!-- UBICACIÓN -->
+
+  <div class="location">
+
+    <div class="locationTitle">
+      📍 Mi ubicación
+    </div>
+
+    <div
+      id="locationStatus"
+      class="status">
+      Ubicación no activada
+    </div>
+
+    <button
+      id="locationBtn"
+      class="locationBtn"
+      onclick="getLocation()">
+      📍 Activar ubicación
+    </button>
+
+    <div
+      id="debug"
+      class="debug">
+    </div>
+
+  </div>
+
+  <!-- RESULTADO -->
+
+  <div
+    id="result"
+    class="result">
+
+    <b>Dispositivo encontrado</b>
+
+    <div
+      id="resultId"
+      class="status">
+    </div>
+
+    <div
+      id="resultStatus"
+      class="status">
+    </div>
+
+    <div
+      id="map"
+      class="map">
+      Sin ubicación
+    </div>
+
+    <button
+      id="mapsButton"
+      class="maps">
+      🗺️ Ir a Google Maps
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ================= MENU ================= -->
+
+<div
+  id="menuOverlay"
+  class="overlay"
+  onclick="closeMenu()">
+
+  <div
+    class="menu"
+    onclick="event.stopPropagation()">
+
+    <button onclick="searchInternet()">
+      🌐 Buscar con Internet
+    </button>
+
+    <button onclick="offlineSearch()">
+      📵 Buscar sin Internet
+    </button>
+
+    <button onclick="openProfile()">
+      👤 Mi perfil
+    </button>
+
+    <button onclick="showMessage('Configuración próximamente')">
+      ⚙️ Configuración
+    </button>
+
+    <button onclick="showMessage('Activa la ubicación para que FindKey pueda guardar tu posición.')">
+      ❓ Ayuda
+    </button>
+
+  </div>
+
+</div>
+
+<!-- ================= PERFIL ================= -->
+
+<div
+  id="profile"
+  class="panel">
+
+  <div class="panelHeader">
+
+    <button
+      class="close"
+      onclick="closeProfile()">
+      ←
+    </button>
+
+    <h2>Mi perfil</h2>
+
+  </div>
+
+  <div class="info">
+
+    <div class="row">
+      <div class="label">
+        ID permanente
+      </div>
+      <div
+        id="profileId"
+        class="value">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">
+        Dispositivo
+      </div>
+      <div
+        id="device"
+        class="value">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">
+        Android
+      </div>
+      <div
+        id="android"
+        class="value">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">
+        Batería
+      </div>
+      <div
+        id="battery"
+        class="value">
+        Consultando...
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">
+        Ubicación
+      </div>
+      <div
+        id="profileLocation"
+        class="value">
+        No activada
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">
+        Internet
+      </div>
+      <div
+        id="internet"
+        class="value">
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+
+/* =================================================
+   SERVIDOR FINDKEY
+================================================= */
+
+const API =
+  "https://wynex-server.onrender.com";
+
+
+/* =================================================
+   ID PERMANENTE
+================================================= */
+
+let findKeyId =
+  localStorage.getItem("findkey_id");
+
+if(!findKeyId){
+
+  const bytes =
+    new Uint8Array(5);
+
+  crypto.getRandomValues(bytes);
+
+  let code = "";
+
+  bytes.forEach(function(byte){
+
+    code +=
+      byte
+      .toString(16)
+      .padStart(2,"0")
+      .toUpperCase();
+
+  });
+
+  findKeyId =
+    "FK-" + code;
+
+  localStorage.setItem(
+    "findkey_id",
+    findKeyId
+  );
+
+}
+
+
+/* =================================================
+   VARIABLES
+================================================= */
+
+let latitude = null;
+let longitude = null;
+let accuracy = null;
+
+
+/* =================================================
+   INICIAR
+================================================= */
+
+function startFindKey(){
+
+  document.getElementById(
+    "intro"
+  ).style.opacity="0";
+
+  setTimeout(function(){
+
+    document.getElementById(
+      "intro"
+    ).style.display="none";
+
+    document.getElementById(
+      "app"
+    ).style.display="block";
+
+  },500);
+
+  updateProfile();
+
+}
+
+
+/* =================================================
+   TOAST
+================================================= */
+
+function showMessage(message){
+
+  const toast =
+    document.getElementById("toast");
+
+  toast.textContent =
+    message;
+
+  toast.classList.add("show");
+
+  clearTimeout(
+    window.toastTimer
+  );
+
+  window.toastTimer =
+    setTimeout(function(){
+
+      toast.classList.remove("show");
+
+    },3500);
+
+}
+
+
+/* =================================================
+   MENU
+================================================= */
+
+function openMenu(){
+
+  document.getElementById(
+    "menuOverlay"
+  ).style.display="block";
+
+}
+
+function closeMenu(){
+
+  document.getElementById(
+    "menuOverlay"
+  ).style.display="none";
+
+}
+
+function searchInternet(){
+
+  closeMenu();
+
+  document.getElementById(
+    "searchInput"
+  ).focus();
+
+}
+
+
+/* =================================================
+   PERFIL
+================================================= */
+
+function openProfile(){
+
+  closeMenu();
+
+  document.getElementById(
+    "profile"
+  ).style.display="block";
+
+  updateProfile();
+
+}
+
+function closeProfile(){
+
+  document.getElementById(
+    "profile"
+  ).style.display="none";
+
+}
+
+
+/* =================================================
+   PERFIL
+================================================= */
+
+function updateProfile(){
+
+  document.getElementById(
+    "profileId"
+  ).textContent =
+    findKeyId;
+
+  document.getElementById(
+    "device"
+  ).textContent =
+    navigator.userAgent;
+
+  const android =
+    navigator.userAgent.match(
+      /Android\s([0-9.]+)/i
+    );
+
+  document.getElementById(
+    "android"
+  ).textContent =
+    android
+      ? "Android " + android[1]
+      : "No identificado";
+
+  document.getElementById(
+    "internet"
+  ).textContent =
+    navigator.onLine
+      ? "🟢 En línea"
+      : "🔴 Sin Internet";
+
+}
+
+
+/* =================================================
+   BATERÍA
+================================================= */
+
+async function batteryInfo(){
+
+  if(!navigator.getBattery){
+
+    document.getElementById(
+      "battery"
+    ).textContent =
+      "No disponible";
+
+    return;
+
+  }
+
+  try{
+
+    const battery =
+      await navigator.getBattery();
+
+    function updateBattery(){
+
+      document.getElementById(
+        "battery"
+      ).textContent =
+        Math.round(
+          battery.level * 100
+        ) +
+        "% " +
+        (
+          battery.charging
+          ? "⚡ Cargando"
+          : "🔋"
+        );
+
+    }
+
+    updateBattery();
+
+    battery.addEventListener(
+      "levelchange",
+      updateBattery
+    );
+
+    battery.addEventListener(
+      "chargingchange",
+      updateBattery
+    );
+
+  }catch(e){
+
+    document.getElementById(
+      "battery"
+    ).textContent =
+      "No disponible";
+
+  }
+
+}
+
+
+/* =================================================
+   GPS
+================================================= */
+
+function getLocation(){
+
+  const button =
+    document.getElementById(
+      "locationBtn"
+    );
+
+  const status =
+    document.getElementById(
+      "locationStatus"
+    );
+
+  const debug =
+    document.getElementById(
+      "debug"
+    );
+
+  const profileLocation =
+    document.getElementById(
+      "profileLocation"
+    );
+
+
+  /* COMPROBAR GEOLOCALIZACIÓN */
+
+  if(!navigator.geolocation){
+
+    status.textContent =
+      "❌ Este APK no proporciona geolocalización.";
+
+    debug.style.display =
+      "block";
+
+    debug.textContent =
+      "navigator.geolocation no existe. " +
+      "El conversor APK/WebView no está proporcionando GPS.";
+
+    showMessage(
+      "Este APK no permite usar GPS."
+    );
+
+    return;
+
+  }
+
+
+  button.disabled = true;
+
+  button.textContent =
+    "📍 Buscando GPS...";
+
+  status.textContent =
+    "Solicitando ubicación...";
+
+  debug.style.display =
+    "block";
+
+  debug.textContent =
+    "Conectando con el GPS del dispositivo...";
+
+
+  navigator.geolocation.getCurrentPosition(
+
+    function(position){
+
+      latitude =
+        position.coords.latitude;
+
+      longitude =
+        position.coords.longitude;
+
+      accuracy =
+        position.coords.accuracy;
+
+
+      const metros =
+        Math.round(accuracy);
+
+
+      status.textContent =
+        "🟢 Ubicación activa • ±" +
+        metros +
+        " m";
+
+      profileLocation.textContent =
+        "🟢 Activa • ±" +
+        metros +
+        " m";
+
+
+      debug.textContent =
+        "GPS correcto.\n" +
+        "Latitud: " +
+        latitude +
+        "\nLongitud: " +
+        longitude +
+        "\nPrecisión: ±" +
+        metros +
+        " m";
+
+
+      button.textContent =
+        "📍 Ubicación activa";
+
+      button.classList.add(
+        "active"
+      );
+
+      button.disabled = false;
+
+
+      showMessage(
+        "Ubicación obtenida correctamente ✅"
+      );
+
+
+      /* ENVIAR AL SERVIDOR */
+
+      sendLocation();
+
+    },
+
+    function(error){
+
+      button.disabled = false;
+
+      button.textContent =
+        "📍 Activar ubicación";
+
+
+      let message =
+        "Error desconocido";
+
+
+      if(error.code === 1){
+
+        message =
+          "Permiso de ubicación rechazado";
+
+        status.textContent =
+          "❌ Permiso rechazado";
+
+      }
+
+      else if(error.code === 2){
+
+        message =
+          "GPS no disponible";
+
+        status.textContent =
+          "❌ GPS no disponible";
+
+      }
+
+      else if(error.code === 3){
+
+        message =
+          "Tiempo de espera agotado";
+
+        status.textContent =
+          "❌ Tiempo agotado";
+
+      }
+
+
+      debug.style.display =
+        "block";
+
+      debug.textContent =
+        "Código GPS: " +
+        error.code +
+        "\n" +
+        "Mensaje: " +
+        error.message;
+
+
+      profileLocation.textContent =
+        "❌ No disponible";
+
+
+      showMessage(
+        message
+      );
+
+
+      console.log(
+        "FindKey GPS ERROR:",
+        error.code,
+        error.message
+      );
+
+    },
+
+    {
+
+      enableHighAccuracy:true,
+
+      timeout:30000,
+
+      maximumAge:0
+
+    }
+
+  );
+
+}
+
+
+/* =================================================
+   ENVIAR UBICACIÓN
+================================================= */
+
+async function sendLocation(){
+
+  if(
+    latitude === null ||
+    longitude === null
+  ){
+
+    return;
+
+  }
+
+
+  try{
+
+    const response =
+      await fetch(
+        API +
+        "/api/findkey/location",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            id:
+              findKeyId,
+
+            latitude:
+              latitude,
+
+            longitude:
+              longitude,
+
+            accuracy:
+              accuracy
+
+          })
+
+        }
+      );
+
+
+    if(response.ok){
+
+      showMessage(
+        "Ubicación enviada a FindKey ✅"
+      );
+
+    }
+
+    else{
+
+      console.log(
+        "Servidor respondió:",
+        response.status
+      );
+
+      showMessage(
+        "GPS correcto, pero el servidor no respondió."
+      );
+
+    }
+
+  }
+
+  catch(error){
+
+    console.log(
+      "FindKey API:",
+      error
+    );
+
+    showMessage(
+      "GPS correcto. No hay conexión con el servidor."
+    );
+
+  }
+
+}
+
+
+/* =================================================
+   BUSCAR
+================================================= */
+
+async function searchDevice(){
+
+  const input =
+    document.getElementById(
+      "searchInput"
+    );
+
+  const id =
+    input.value
+      .trim()
+      .toUpperCase();
+
+
+  if(!id){
+
+    showMessage(
+      "Ingresa un ID de FindKey."
+    );
+
+    return;
+
+  }
+
+
+  const result =
+    document.getElementById(
+      "result"
+    );
+
+  const resultId =
+    document.getElementById(
+      "resultId"
+    );
+
+  const resultStatus =
+    document.getElementById(
+      "resultStatus"
+    );
+
+  const map =
+    document.getElementById(
+      "map"
+    );
+
+
+  result.style.display =
+    "block";
+
+  resultId.textContent =
+    "ID: " + id;
+
+  resultStatus.textContent =
+    "Consultando...";
+
+  map.textContent =
+    "🔄 Buscando ubicación...";
+
+
+  try{
+
+    const response =
+      await fetch(
+        API +
+        "/api/findkey/location/" +
+        encodeURIComponent(id),
+        {
+          method:"GET",
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      resultStatus.textContent =
+        "No hay información disponible.";
+
+      map.textContent =
+        "📍 Sin ubicación";
+
+      showMessage(
+        "No se encontró información."
+      );
+
+      return;
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if(
+      typeof data.latitude === "number" &&
+      typeof data.longitude === "number"
+    ){
+
+      const lat =
+        data.latitude;
+
+      const lon =
+        data.longitude;
+
+
+      resultStatus.textContent =
+        "🟢 Ubicación disponible";
+
+
+      map.innerHTML =
+        "📍<br>" +
+        Number(lat).toFixed(6) +
+        "<br>" +
+        Number(lon).toFixed(6);
+
+
+      document.getElementById(
+        "mapsButton"
+      ).onclick =
+      function(){
+
+        window.open(
+          "https://www.google.com/maps?q=" +
+          encodeURIComponent(
+            lat + "," + lon
+          ),
+          "_blank"
+        );
+
+      };
+
+
+      showMessage(
+        "Ubicación encontrada ✅"
+      );
+
+    }
+
+    else{
+
+      resultStatus.textContent =
+        "Sin ubicación";
+
+      map.textContent =
+        "📍 No hay ubicación disponible.";
+
+    }
+
+  }
+
+  catch(error){
+
+    console.log(
+      "FindKey SEARCH:",
+      error
+    );
+
+    resultStatus.textContent =
+      "Servidor no disponible.";
+
+    map.textContent =
+      "⚠️ No se pudo conectar con FindKey.";
+
+    showMessage(
+      "No se pudo conectar con el servidor."
+    );
+
+  }
+
+}
+
+
+/* =================================================
+   SIN INTERNET
+================================================= */
+
+function offlineSearch(){
+
+  closeMenu();
+
+  showMessage(
+    "La búsqueda sin Internet utilizará datos guardados."
+  );
+
+}
+
+
+/* =================================================
+   INTERNET
+================================================= */
+
+window.addEventListener(
+  "online",
+  function(){
+
+    updateProfile();
+
+    showMessage(
+      "🟢 Internet conectado"
+    );
+
+  }
+);
+
+window.addEventListener(
+  "offline",
+  function(){
+
+    updateProfile();
+
+    showMessage(
+      "🔴 Sin Internet"
+    );
+
+  }
+);
+
+
+/* =================================================
+   INICIO
+================================================= */
+
+batteryInfo();
+
+</script>
+
+</body>
+    </html>
